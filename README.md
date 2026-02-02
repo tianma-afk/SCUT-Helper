@@ -61,6 +61,7 @@ git clone https://github.com/scut-embedded/scut_helper.git
 cd scut_helper
 
 # 2. 创建并激活Conda环境
+#用别的虚拟环境也可以
 conda create -n scut_helper python=3.11 -y
 conda activate scut_helper
 
@@ -68,15 +69,14 @@ conda activate scut_helper
 cd backend
 pip install -r requirements.txt
 
+cd app
 # 4. 配置环境变量
-cp .env.example .env
+#Linux/macOS 使用 cp 命令
+copy .env.example .env
 # 编辑.env文件设置数据库和密钥
 
-# 5. 初始化数据库
-alembic upgrade head
-
-# 6. 启动服务
-uvicorn app.main:app --reload --host 127.0.0.1 --port 8000
+# 5. 启动服务
+uvicorn main:app --reload 
 ```
 
 ### 前端启动（后续开发）
