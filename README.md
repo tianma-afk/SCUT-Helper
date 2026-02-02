@@ -140,7 +140,7 @@ chore:   构建/工具
 
 ## 📞 联系我们
 
-- **项目仓库**：[https://github.com/scut-embedded/scut_helper](https://github.com/scut-embedded/scut_helper)
+- **项目仓库**：[[tianma-afk/SCUT-Helper: 一个华工学生的日常智能助手。](https://github.com/tianma-afk/SCUT-Helper)](https://github.com/scut-embedded/scut_helper)
 - **协会官网**：[https://embedded.scut.edu.cn](https://embedded.scut.edu.cn)
 - **交流群**：QQ群 1026210091(软件方向)嵌入式协会交流群
 

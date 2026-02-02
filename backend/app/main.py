@@ -1,19 +1,22 @@
-"""
-FastAPI 启动文件
-"""
+from routers import news,users
 from fastapi import FastAPI
-from app.core.config import settings
+from fastapi.middleware.cors import CORSMiddleware
+app = FastAPI()
 
-app = FastAPI(
-    title=settings.PROJECT_NAME,
-    docs_url="/docs",
-    redoc_url="/redoc"
+# 配置CORS
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],  # 允许所有来源，生产环境中请指定具体域名
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
 )
 
 @app.get("/")
-def read_root():
-    return {"message": "鲤工助手后端运行中"}
+async def root():
+    return {"message": "Hello World"}
 
-@app.get("/health")
-def health_check():
-    return {"status": "healthy", "environment": "conda"}
+app.include_router(news.router)
+app.include_router(users.router)
+
+# 运行命令：uvicorn main:app --reload
