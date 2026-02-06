@@ -33,22 +33,15 @@
 scut_helper/
 ├── backend/                    # FastAPI后端
 │   ├── app/
-│   │   ├── api/              # API路由
-│   │   ├── core/             # 核心配置
+│   │   ├── routers/              # API路由
+│   │   ├── config/             # 核心配置
 │   │   ├── models/           # 数据模型
-│   │   ├── schemas/          # Pydantic模型
 │   │   ├── crud/             # 数据库操作
-│   │   ├── services/         # 业务逻辑
+│   │   ├── utils/         # 业务逻辑
 │   │   └── main.py           # 应用入口
-│   ├── alembic/              # 数据库迁移
 │   └── requirements.txt      # Python依赖
-├── frontend/                  # Vue.js前端
-│   ├── src/
-│   │   ├── views/           # 页面组件
-│   │   ├── components/      # 可复用组件
-│   │   ├── api/             # API调用
-│   │   └── store/           # 状态管理
-│   └── package.json
+├── frontend/                  # 前端
+│   
 └── README.md
 ```
 
@@ -90,7 +83,7 @@ npm run dev
 
 ### 后端
 - **框架**：FastAPI + Uvicorn
-- **数据库**：SQLite（开发）→ PostgreSQL（生产）
+- **数据库**：MySQL（开发）→ PostgreSQL（生产）
 - **ORM**：SQLAlchemy + Alembic迁移
 - **认证**：JWT + OAuth2.0
 - **缓存**：Redis

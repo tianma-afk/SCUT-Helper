@@ -3,7 +3,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.exc import IntegrityError
 import bcrypt
 from sqlalchemy import select
-from models.users import User  # 导入ORM模型
+from models.users import User  
 
 # -------------------------- 注册相关 --------------------------
 async def create_user(db: AsyncSession, username: str, account_name: str, password: str):
@@ -46,8 +46,21 @@ async def get_user_by_account(db: AsyncSession, account_name: str):
     result =await db.execute(select(User).where(User.account_name == account_name))
     return result.scalars().first()
 
+async def get_user_by_id(db: AsyncSession, user_id: str):
+    """根据用户ID查询用户"""
+    result = await db.execute(select(User).where(User.user_id == user_id))
+    return result.scalars().first()
+
+
 def verify_password(plain_password: str, hashed_password: str):
     """验证原始密码和哈希密码是否匹配"""
     plain_bytes = plain_password.encode("utf-8")
     hashed_bytes = hashed_password.encode("utf-8")
     return bcrypt.checkpw(plain_bytes, hashed_bytes)
+
+
+# -------------------------- 获取所有用户 --------------------------
+async def get_all_users(db: AsyncSession):
+    """获取所有用户"""
+    result = await db.execute(select(User))
+    return result.scalars().all()
