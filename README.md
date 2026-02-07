@@ -50,16 +50,16 @@ scut_helper/
 ### 后端启动
 ```bash
 # 1. 克隆项目
-git clone https://github.com/scut-embedded/scut_helper.git
+git clone https://github.com/tianma-afk/scut_helper.git
 cd scut_helper
 
-# 2. 创建并激活Conda环境
-#用别的虚拟环境也可以
-conda create -n scut_helper python=3.11 -y
-conda activate scut_helper
+# 2. 创建并激活venv环境
+cd backend
+python -m venv venv
+venv\Scripts\activate.bat  #Windows环境
+source venv/bin/activate #MacOS或Linux
 
 # 3. 安装后端依赖
-cd backend
 pip install -r requirements.txt
 
 cd app
