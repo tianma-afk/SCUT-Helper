@@ -7,15 +7,33 @@ USE scut_helper;
 
 -- 1. 用户表
 CREATE TABLE IF NOT EXISTS users (
-    user_id       CHAR(36)     NOT NULL PRIMARY KEY COMMENT '用户UUID',
-    username      VARCHAR(50)  NOT NULL COMMENT '用户名',
-    account_name  VARCHAR(20)  NOT NULL UNIQUE COMMENT '登录账号（唯一）',
-    password_hash VARCHAR(255) NOT NULL COMMENT '密码哈希值',
-    created_at    DATETIME DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
-    updated_at    DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间'
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='用户核心信息表';
+    user_id      CHAR(36)      NOT NULL PRIMARY KEY COMMENT '用户UUID，主键',
+    email        VARCHAR(100)  NOT NULL UNIQUE COMMENT '用户邮箱（核心登录标识），唯一不可重复',
+    password     VARCHAR(255)          COMMENT '密码哈希值（BCrypt加密存储），为空则仅支持验证码登录',
+    username     VARCHAR(100)  NOT NULL COMMENT '用户名',
+    headimg_url  VARCHAR(500)          COMMENT '用户头像URL（可选）',
+    gender       TINYINT       DEFAULT 0 COMMENT '性别：0未知，1男，2女',
+    created_at   DATETIME      DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+    updated_at   DATETIME      DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+    -- 索引：优化邮箱登录的查询效率（高频查询字段必须加索引）
+    INDEX idx_email (email)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='用户表';
 
--- 2. 登录安全表
+-- 2. 邮箱验证码记录表
+CREATE TABLE IF NOT EXISTS email_verification_codes (
+    id           INT UNSIGNED  NOT NULL AUTO_INCREMENT PRIMARY KEY COMMENT '主键ID',
+    email        VARCHAR(100)  NOT NULL COMMENT '接收验证码的邮箱',
+    code         VARCHAR(4)    NOT NULL COMMENT '4位数字验证码（随机生成）',
+    type         TINYINT       NOT NULL COMMENT '验证码类型：1-登录，2-注册，3-找回密码',
+    expires_at   DATETIME      NOT NULL COMMENT '验证码过期时间（建议5分钟有效期）',
+    is_used      BOOLEAN       DEFAULT FALSE COMMENT '是否已使用（防止重复验证）',
+    created_at   DATETIME      DEFAULT CURRENT_TIMESTAMP COMMENT '生成时间',
+    updated_at   DATETIME      DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+    -- 索引：优化验证码校验时的查询效率
+    INDEX idx_email_type (email, type)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='邮箱验证码记录表（登录/注册/找回密码专用）';
+
+-- 3. 登录安全表
 CREATE TABLE IF NOT EXISTS user_security (
     user_id               CHAR(36) NOT NULL COMMENT '关联用户UUID',
     login_attempts        INT NOT NULL DEFAULT 0 COMMENT '连续登录失败次数',
@@ -27,7 +45,7 @@ CREATE TABLE IF NOT EXISTS user_security (
     FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='用户登录安全控制表';
 
--- 3. 用户登录日志表
+-- 4. 用户登录日志表
 CREATE TABLE IF NOT EXISTS user_login_log (
     log_id          BIGINT AUTO_INCREMENT PRIMARY KEY COMMENT '日志主键，自增ID',
     user_id         CHAR(36) NOT NULL COMMENT '关联用户UUID',

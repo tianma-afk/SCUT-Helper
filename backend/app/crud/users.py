@@ -1,66 +1,161 @@
-# crud/users.py
+from typing import Dict, Optional, List
+import uuid
+from datetime import datetime, timedelta
+from sqlalchemy.future import select
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy.exc import IntegrityError
-import bcrypt
-from sqlalchemy import select
-from models.users import User  
+from passlib.context import CryptContext
+from jose import jwt
+from models.users import User 
+import os
+from dotenv import load_dotenv
+from crud.email_verification_code import verify_code
 
-# -------------------------- 注册相关 --------------------------
-async def create_user(db: AsyncSession, username: str, account_name: str, password: str):
-    """
-    创建新用户（注册）
-    :param db: 数据库会话
-    :param username: 用户名
-    :param account_name: 账户名（唯一）
-    :param password: 原始密码（前端传入，后端哈希后存储）
-    :return: 新建的用户对象 / 错误信息
-    """
-    # 1. 密码哈希（BCrypt，自带盐值，不可逆）
-    password_bytes = password.encode("utf-8")
-    salt = bcrypt.gensalt()  # 生成随机盐值
-    password_hash = bcrypt.hashpw(password_bytes, salt).decode("utf-8")
-    
-    # 2. 创建User对象
-    db_user = User(
-        username=username,
-        account_name=account_name,  # 账户名唯一
-        password_hash=password_hash
-    )
+# 加载环境变量
+load_dotenv()
 
+# -------------------------- 配置项 --------------------------
+# 密码加密上下文（BCrypt算法）
+pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+# JWT配置（需和项目统一）
+JWT_SECRET_KEY = os.getenv("JWT_SECRET_KEY")  # 建议放到配置文件
+ALGORITHM = "HS256"
+ACCESS_TOKEN_EXPIRE_HOURS = 24*7  # Token有效期1周
+
+# -------------------------- 核心CRUD函数 --------------------------
+async def user_register(
+    db: AsyncSession,
+    email: str,
+    username: str,
+    password: str,
+    code: str
+) -> Optional[User]:
+    """
+    邮箱注册用户逻辑：
+    1. 密码加密处理
+    2. 生成UUID用户ID
+    3. 创建新用户并写入数据库
+    """
     try:
-        # 3. 写入数据库
-        db.add(db_user)
+        # 步骤1：密码BCrypt加密
+        hashed_password = pwd_context.hash(password)
+        
+        # 步骤2：构建用户对象
+        new_user = User(
+            user_id=str(uuid.uuid4()),
+            email=email,
+            username=username,
+            password=hashed_password,
+            gender=0,  # 默认未知性别
+            created_at=datetime.now(),
+            updated_at=datetime.now()
+        )
+        
+        # 步骤3：校验验证码
+        ret = await verify_code(db, email, code, 2)
+        if ret==False:
+            raise Exception(f"验证码错误或过期")
+        
+        # 步骤4：写入数据库
+        db.add(new_user)
         await db.commit()
-        await db.refresh(db_user)  # 刷新对象，获取完整字段（如自动生成的user_id）
-        print("-"*20)
-        print(db_user)
-        return db_user
-    except IntegrityError:
-        # 捕获账户名重复的异常
+        await db.refresh(new_user)
+        return new_user
+    except Exception:
         await db.rollback()
         return None
 
-# -------------------------- 登录相关 --------------------------
-async def get_user_by_account(db: AsyncSession, account_name: str):
-    """根据账户名查询用户"""
-    result =await db.execute(select(User).where(User.account_name == account_name))
+async def user_login(
+    db: AsyncSession,
+    email: str,
+    password: str
+) -> Optional[str]:
+    """
+    邮箱密码登录逻辑：
+    1. 校验邮箱是否存在
+    2. 校验密码是否正确
+    3. 生成JWT Token返回
+    """
+    # 步骤1：查询用户（异步查询）
+    result = await db.execute(select(User).where(User.email == email))
+    user = result.scalars().first()
+    
+    # 步骤2：校验密码（BCrypt验证）
+    if not user or not pwd_context.verify(password, user.password):
+        return None
+    
+    # 步骤3：生成JWT Token
+    access_token = jwt.encode(
+        claims={
+            "user_id": user.user_id,
+            "email": user.email,
+            "exp": datetime.now() + timedelta(hours=ACCESS_TOKEN_EXPIRE_HOURS)
+        },
+        key=JWT_SECRET_KEY,
+        algorithm=ALGORITHM
+    )
+    return access_token
+
+async def update_user_password(
+    db: AsyncSession,
+    email: str,
+    old_password: str,
+    new_password: str
+) -> bool:
+    """
+    修改密码逻辑：
+    1. 校验原密码正确性
+    2. 新密码加密处理
+    3. 更新密码并提交
+    """
+    try:
+        # 步骤1：查询用户
+        result = await db.execute(select(User).where(User.email == email))
+        user = result.scalars().first()
+        
+        # 步骤2：校验原密码
+        if not user or not pwd_context.verify(old_password, user.password):
+            return False
+        
+        # 步骤3：新密码加密并更新
+        user.password = pwd_context.hash(new_password)
+        user.updated_at = datetime.now()
+        
+        await db.commit()
+        await db.refresh(user)
+        return True
+    except Exception:
+        await db.rollback()
+        return False
+
+async def get_user_by_email(
+    db: AsyncSession,
+    email: str
+) -> Optional[User]:
+    """
+    根据邮箱查询用户：
+    用于注册时校验邮箱是否已存在
+    """
+    result = await db.execute(select(User).where(User.email == email))
     return result.scalars().first()
 
-async def get_user_by_id(db: AsyncSession, user_id: str):
-    """根据用户ID查询用户"""
+async def get_user_by_id(
+    db: AsyncSession,
+    user_id: str
+) -> Optional[User]:
+    """
+    根据用户ID查询用户：
+    用于登录时校验用户ID和密码
+    """
     result = await db.execute(select(User).where(User.user_id == user_id))
     return result.scalars().first()
 
-
-def verify_password(plain_password: str, hashed_password: str):
-    """验证原始密码和哈希密码是否匹配"""
-    plain_bytes = plain_password.encode("utf-8")
-    hashed_bytes = hashed_password.encode("utf-8")
-    return bcrypt.checkpw(plain_bytes, hashed_bytes)
-
-
-# -------------------------- 获取所有用户 --------------------------
-async def get_all_users(db: AsyncSession):
-    """获取所有用户"""
+async def get_all_users(
+    db: AsyncSession
+) -> List[User]:
+    """
+    获取所有用户逻辑：
+    异步查询所有用户并返回列表
+    """
     result = await db.execute(select(User))
-    return result.scalars().all()
+    users = result.scalars().all()
+    return users

@@ -69,7 +69,9 @@ copy .env.example .env
 # 编辑.env文件设置数据库和密钥
 
 # 5. 启动服务
-uvicorn main:app --reload 
+uvicorn main:app --host 0.0.0.0 --port 8000 --reload
+#服务器使用虚拟环境的uvicorn启动
+#/opt/SCUT-Helper/backend/venv/bin/uvicorn main:app --host 0.0.0.0 --port 8000 --reload
 ```
 
 ### 前端启动（后续开发）
