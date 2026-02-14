@@ -1,6 +1,7 @@
 from routers import user_security
 from routers import users
 from routers import user_login_log
+from routers import products
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 import uvicorn
@@ -25,7 +26,8 @@ async def root():
 app.include_router(users.router)
 app.include_router(user_security.router)
 app.include_router(user_login_log.router)
+app.include_router(products.router)
 
 if __name__ == "__main__":
-    uvicorn.run(app, host="0.0.0.0", port=443, ssl_keyfile=os.getenv("SSL_KEYFILE"), ssl_certfile=os.getenv("SSL_CERTFILE"))
+    uvicorn.run(app, host="0.0.0.0", port=8443, ssl_keyfile=os.getenv("SSL_KEYFILE"), ssl_certfile=os.getenv("SSL_CERTFILE"))
 # 运行命令：python main.py

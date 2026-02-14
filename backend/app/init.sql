@@ -76,18 +76,27 @@ CREATE TABLE IF NOT EXISTS products (
     product_content longtext COMMENT '商品内容/详情',
     product_images varchar(2048) COMMENT '商品图片（JSON数组或逗号分隔URL）',
     trade_desc varchar(512) COMMENT '交易说明',
-    publisher_id bigint unsigned NOT NULL COMMENT '发布者ID',
+    publisher_id CHAR(36) NOT NULL COMMENT '发布者ID（关联users.user_id）',  -- 修改数据类型
     created_at datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
     updated_at datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
     status tinyint unsigned NOT NULL DEFAULT '1' COMMENT '商品状态：1-上架，0-下架',
     product_category_id int unsigned NOT NULL COMMENT '商品分类ID',
     product_price float NOT NULL COMMENT '商品价格',
     PRIMARY KEY (product_id),
-    KEY idx_publisher_id (publisher_id),
+    KEY idx_publisher_id (publisher_id),  -- 索引
     KEY idx_status (status),
-    KEY products_product_categories_category_id_fk (product_category_id),
-    CONSTRAINT products_product_categories_category_id_fk
+    KEY idx_category_id (product_category_id),
+    -- 添加外键约束：关联用户表
+    CONSTRAINT fk_products_publisher
+        FOREIGN KEY (publisher_id)
+        REFERENCES users (user_id)
+        ON DELETE RESTRICT  -- 限制删除：有商品时不能删除用户
+        ON UPDATE CASCADE,  -- 级联更新：如果user_id变更，自动更新publisher_id
+    -- 添加外键约束：关联分类表
+    CONSTRAINT fk_products_category
         FOREIGN KEY (product_category_id)
         REFERENCES product_categories (category_id)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='商品表';
+        ON DELETE RESTRICT
+        ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='商品表';
 

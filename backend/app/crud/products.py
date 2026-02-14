@@ -32,4 +32,4 @@ async def get_product_by_keyword(db: AsyncSession, keyword: str, skip: int = 0, 
 async def get_product_details(db: AsyncSession, product_id: int):
     stmt = select(Product).where(Product.product_id == product_id)
     result = await db.execute(stmt)
-    return result.scalar_one()
+    return result.scalar_one_or_none()

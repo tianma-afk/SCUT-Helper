@@ -3,7 +3,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from config.db_config import get_db
 from crud import products
 
-router = APIRouter(prefix="/api/product" , tags=["products"])
+router = APIRouter(prefix="/api/product" , tags=["商品"])
 
 @router.get("/categories")
 async def get_categories(skip: int = 0, limit: int = 100,db:AsyncSession = Depends(get_db)):
