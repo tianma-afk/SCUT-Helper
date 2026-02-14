@@ -47,6 +47,8 @@ async def get_code(request: GetCodeRequest, db: AsyncSession = Depends(get_db)):
     # 2. 调用获取验证码逻辑
     try:
         await send_code(db, request.email)
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
     

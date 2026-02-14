@@ -101,7 +101,8 @@ async def send_code(
     except Exception as e:
         # 系统异常（邮件发送失败/数据库错误）
         await db.rollback()
-        raise Exception(f"发送验证码失败：{str(e)}")
+        print(f"Error: 发送验证码失败：{str(e)}")
+        raise Exception(f"服务器异常：发送验证码失败")
 
 # -------------------------- 辅助函数：获取验证码类型描述 --------------------------
 def _get_type_desc(code_type: int) -> str:
