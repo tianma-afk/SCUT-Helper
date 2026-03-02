@@ -3,23 +3,11 @@ import uuid
 from datetime import datetime, timedelta
 from sqlalchemy.future import select
 from sqlalchemy.ext.asyncio import AsyncSession
-from passlib.context import CryptContext
 from jose import jwt
 from models.users import User 
-import os
-from dotenv import load_dotenv
 from crud.email_verification_code import verify_code
+from config.env_config import pwd_context, JWT_SECRET_KEY, ALGORITHM,ACCESS_TOKEN_EXPIRE_HOURS
 
-# 加载环境变量
-load_dotenv()
-
-# -------------------------- 配置项 --------------------------
-# 密码加密上下文（BCrypt算法）
-pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
-# JWT配置（需和项目统一）
-JWT_SECRET_KEY = os.getenv("JWT_SECRET_KEY")  # 建议放到配置文件
-ALGORITHM = "HS256"
-ACCESS_TOKEN_EXPIRE_HOURS = 24*7  # Token有效期1周
 
 # -------------------------- 核心CRUD函数 --------------------------
 async def user_register(

@@ -8,16 +8,8 @@ from sqlalchemy.future import select
 from sqlalchemy.ext.asyncio import AsyncSession
 from models.email_verification_code import EmailVerificationCode
 import base64
-import os
-from dotenv import load_dotenv
-load_dotenv()
-# -------------------------- 邮件发送配置 --------------------------
-# 示例：QQ邮箱配置（需开启SMTP并获取授权码）
-SMTP_HOST = os.getenv("SMTP_HOST")       # SMTP服务器地址
-SMTP_PORT = int(os.getenv("SMTP_PORT"))  # SMTP端口（SSL加密）
-SMTP_USER = os.getenv("SMTP_USER") # 发件人邮箱
-SMTP_PASS = os.getenv("SMTP_PASS")    # 邮箱SMTP授权码（非登录密码）
-SENDER_NAME = os.getenv("SENDER_NAME")     # 发件人显示名称
+from config.env_config import SMTP_HOST, SMTP_PORT, SMTP_USER, SMTP_PASS, SENDER_NAME
+
 
 # -------------------------- 发送验证码 --------------------------
 async def send_code(

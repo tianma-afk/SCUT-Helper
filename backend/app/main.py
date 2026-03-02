@@ -5,9 +5,9 @@ from routers import products
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 import uvicorn
-import os
-from dotenv import load_dotenv
-load_dotenv()
+from config.env_config import SSL_KEYFILE, SSL_CERTFILE, PORT
+from fastapi import APIRouter
+
 app = FastAPI()
 
 # 配置CORS
@@ -23,11 +23,16 @@ app.add_middleware(
 async def root():
     return {"message": "Hello World"}
 
-app.include_router(users.router)
-app.include_router(user_security.router)
-app.include_router(user_login_log.router)
-app.include_router(products.router)
+main_router = APIRouter(prefix="/api/v1")
+main_router.include_router(users.router)
+main_router.include_router(user_security.router)
+main_router.include_router(user_login_log.router)
+main_router.include_router(products.router)
+
+app.include_router(main_router)
 
 if __name__ == "__main__":
-    uvicorn.run(app, host="0.0.0.0", port=8443, ssl_keyfile=os.getenv("SSL_KEYFILE"), ssl_certfile=os.getenv("SSL_CERTFILE"))
+    uvicorn.run(app, host="0.0.0.0", port=PORT, ssl_keyfile=SSL_KEYFILE, ssl_certfile=SSL_CERTFILE)
+# 在app路径下启动虚拟环境的命令：..\venv\Scripts\activate.bat
 # 运行命令：python main.py
+# 访问FastAPI的交互式接口文档：https://127.0.0.1:8443/docs

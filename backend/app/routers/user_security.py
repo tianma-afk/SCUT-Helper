@@ -5,14 +5,14 @@ from crud.user_security import get_user_security, reset_security_status
 from config.db_config import get_db
 from crud.users import get_user_by_id
 # -------------------------- 定义接口请求/响应模型 --------------------------
-router = APIRouter(prefix="/api/security", tags=["用户安全"])  # 接口前缀/api/security，标签分类
+router = APIRouter(prefix="/security", tags=["用户安全"])  # 接口前缀/api/security，标签分类
 
 class AdminSetSecurityRequest(BaseModel):
     user_id: str = Field(..., description="要设置的用户ID")
     login_attempts: int = Field(0, description="设置登录失败次数，默认0")
     is_locked: bool = Field(False, description="设置是否锁定，默认False（未锁定）")
 
-@router.post("/admin/set_security_status", summary="管理员设置用户安全状态（临时接口）")
+@router.post("/admin/security_status", summary="管理员设置用户安全状态（临时接口）")
 async def admin_set_security_status(
     request: AdminSetSecurityRequest,
     db: AsyncSession = Depends(get_db)

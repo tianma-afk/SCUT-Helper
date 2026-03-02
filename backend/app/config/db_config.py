@@ -5,17 +5,7 @@ from sqlalchemy.ext.asyncio import async_sessionmaker, AsyncSession
 from sqlalchemy import select
 import os
 from dotenv import load_dotenv
-
-# 加载 .env 文件
-load_dotenv()
-# 数据库URL
-ASYNC_DATABASE_URL = (
-    f"mysql+aiomysql://"
-    f"{os.getenv('DB_USER')}:{os.getenv('DB_PASSWORD')}"
-    f"@{os.getenv('DB_HOST')}:{os.getenv('DB_PORT')}"
-    f"/{os.getenv('DB_NAME')}"
-    f"?charset={os.getenv('DB_CHARSET', 'utf8mb4')}"
-)
+from config.env_config import ASYNC_DATABASE_URL
 #创建数据库引擎
 async_engine = create_async_engine(
     ASYNC_DATABASE_URL, 

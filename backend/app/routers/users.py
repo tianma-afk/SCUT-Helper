@@ -5,14 +5,11 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from crud.users import get_all_users, user_register, user_login, update_user_password, get_user_by_email
 from config.db_config import get_db
 from pydantic import Field
-import re
 from crud.user_login_log import create_login_log 
 from crud.email_verification_code import send_code
+from config.env_config import PASSWORD_PATTERN
 # -------------------------- 定义接口请求/响应模型 --------------------------
-router = APIRouter(prefix="/api/users", tags=["用户管理"])  # 接口前缀/api/users，标签分类
-
-# 密码校验正则（至少8位，包含字母和数字）
-PASSWORD_PATTERN = re.compile(r'^(?=.*[A-Za-z])(?=.*\d).{8,}$')
+router = APIRouter(prefix="/users", tags=["用户管理"])  # 接口前缀/api/users，标签分类
 
 #获取验证码请求模型
 class GetCodeRequest(BaseModel):
@@ -117,7 +114,7 @@ async def login(request: LoginRequest, db: AsyncSession = Depends(get_db)):
     }
 
 # -------------------------- 修改密码接口 --------------------------
-@router.post("/update-password", summary="修改密码", description="验证原密码后修改新密码")
+@router.post("/update_password", summary="修改密码", description="验证原密码后修改新密码")
 async def update_password(request: UpdatePasswordRequest, db: AsyncSession = Depends(get_db)):
     # 1. 新密码格式校验
     if not PASSWORD_PATTERN.match(request.new_password):
@@ -145,7 +142,7 @@ async def update_password(request: UpdatePasswordRequest, db: AsyncSession = Dep
     }
 
 # -------------------------- 获取所有用户接口 --------------------------
-@router.get("/all",summary="获取所有用户",description="获取所有用户接口，返回所有用户信息")
+@router.get("/all_users",summary="获取所有用户",description="获取所有用户接口，返回所有用户信息")
 async def all_users(db: AsyncSession = Depends(get_db)):
     """获取所有用户接口"""
     # 1. 查询所有用户

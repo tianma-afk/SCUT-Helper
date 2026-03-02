@@ -8,10 +8,10 @@ from fastapi import Depends
 
 
 # -------------------------- 定义接口请求/响应模型 --------------------------
-router = APIRouter(prefix="/api/login_log", tags=["用户登录日志"])  # 接口前缀/api/login_log，标签分类
+router = APIRouter(prefix="/login_log", tags=["用户登录日志"])  # 接口前缀/api/login_log，标签分类
 
 
-@router.get("/all")
+@router.get("/all_login_logs", summary="查询所有登录日志", description="查询所有用户登录日志")
 async def get_all_login_logs(db: AsyncSession = Depends(get_db)):
     """
     查询所有登录日志
