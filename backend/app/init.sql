@@ -1,6 +1,6 @@
--- 运行以下指令创建数据库和表
--- mysql -u root -p < init.sql 
 -- 数据库名称：scut_helper
+-- 运行以下指令创建数据库和表
+-- mysql -u root -p < init.sql
 
 CREATE DATABASE IF NOT EXISTS scut_helper CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 USE scut_helper;
@@ -99,4 +99,79 @@ CREATE TABLE IF NOT EXISTS products (
         ON DELETE RESTRICT
         ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='商品表';
+
+SHOW TABLES ;
+
+-- 7.帖子分类表
+CREATE TABLE IF NOT EXISTS post_categories(
+    category_id     INT UNSIGNED NOT NULL AUTO_INCREMENT COMMENT '分类ID',
+    category_name   VARCHAR(100) NOT NULL COMMENT '分类名称',
+    created_at      DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '分类创建时间',
+    updated_at      DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '分类更新时间',
+    PRIMARY KEY (category_id)
+)ENGINE =InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='帖子分类表';
+
+-- 8.帖子表
+CREATE TABLE IF NOT EXISTS posts (
+    post_id         BIGINT UNSIGNED NOT NULL AUTO_INCREMENT COMMENT '帖子ID，自增主键',
+    post_title      VARCHAR(255) NOT NULL COMMENT '帖子名称',
+    post_content    LONGTEXT COMMENT '帖子内容/详情',
+    post_images     VARCHAR(2048) DEFAULT NULL COMMENT '帖子图片（JSON数组或逗号分隔URL）',
+    publisher_id    CHAR(36) NOT NULL COMMENT '发布者ID（关联users.user_id）',
+    created_at      DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+    updated_at      DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+    `status`        tinyint unsigned NOT NULL DEFAULT '1' COMMENT '帖子状态：1-上架，0-下架',
+    view_count      INT UNSIGNED NOT NULL DEFAULT 0 COMMENT '浏览量，默认0',
+    like_count      INT UNSIGNED NOT NULL DEFAULT 0 COMMENT '点赞量，默认0',
+    post_category_id INT UNSIGNED NOT NULL COMMENT '帖子分类ID',-- 外键关联post_categories表
+    PRIMARY KEY (post_id),
+    KEY idx_publisher_id (publisher_id),  -- 索引
+    KEY idx_status (status),
+    KEY idx_category_id (post_category_id),
+    -- 添加外键约束：关联用户表
+    CONSTRAINT fk_posts_publisher
+        FOREIGN KEY (publisher_id)
+        REFERENCES users (user_id)
+        ON DELETE RESTRICT  -- 限制删除：有帖子时不能删除用户
+        ON UPDATE CASCADE,  -- 级联更新：如果user_id变更，自动更新publisher_id
+    -- 添加外键约束：关联分类表
+    CONSTRAINT fk_posts_category
+        FOREIGN KEY (post_category_id)
+        REFERENCES post_categories (category_id)
+        ON DELETE RESTRICT
+        ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='帖子表';
+
+-- 9. 帖子评论表
+CREATE TABLE IF NOT EXISTS post_comments (
+    comment_id      BIGINT UNSIGNED NOT NULL AUTO_INCREMENT COMMENT '评论ID，自增主键',
+    post_id         BIGINT UNSIGNED NOT NULL COMMENT '所属帖子ID（外键关联posts）',
+    publisher_id    CHAR(36) NOT NULL COMMENT '评论者ID（外键关联users）',
+    content         TEXT NOT NULL COMMENT '评论内容，非空',
+    like_count      INT UNSIGNED NOT NULL DEFAULT 0 COMMENT '评论点赞数，默认0',
+    created_at      DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '评论时间',
+    `status`        TINYINT UNSIGNED NOT NULL DEFAULT 1 COMMENT '评论状态：1-正常，0-删除',
+
+    PRIMARY KEY (comment_id),
+    KEY idx_post_id (post_id),           -- 查“某篇帖子下有哪些评论”时用到
+    KEY idx_publisher_id (publisher_id), -- 查“某个用户发过哪些评论”时用到
+    KEY idx_status (`status`),           -- 过滤已删除的评论时用到
+    -- 关联posts帖子表
+    CONSTRAINT fk_comments_post
+        FOREIGN KEY (post_id)
+        REFERENCES posts (post_id)
+        ON DELETE CASCADE    -- 如果帖子被删了，帖子底下的评论自动全部清空
+        ON UPDATE CASCADE,   -- 如果帖子ID改变，评论表的对应ID自动更新
+    -- 关联用户表
+    CONSTRAINT fk_comments_publisher
+        FOREIGN KEY (publisher_id)
+        REFERENCES users (user_id)
+        ON DELETE RESTRICT   -- 只要用户发过评论，就不允许随意物理删除该用户
+        ON UPDATE CASCADE    -- 如果用户UUID改变，评论表的对应ID自动更新
+
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='帖子评论表';
+
+
+
+
 
