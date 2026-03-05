@@ -1,0 +1,60 @@
+version: '3.8'
+
+services:
+  # MySQL数据库
+  db:
+    image: mysql:8.0
+    container_name: scut_mysql
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: "${DB_PASSWORD}"
+      MYSQL_DATABASE: "${DB_NAME}"
+      MYSQL_USER: "${DB_USER}"
+      MYSQL_PASSWORD: "${DB_PASSWORD}"
+    ports:
+      - "3307:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+    networks:
+      - scut_network
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      timeout: 20s
+      retries: 10
+
+  # FastAPI后端
+  backend:
+    build: ./backend
+    container_name: scut_backend
+    restart: always
+    ports:
+      - "8443:8443" 
+      - "2222:22" 
+    volumes:
+      - ./backend:/app
+    env_file:
+      - .env
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - scut_network
+
+  # 前端（用nginx托管静态文件）
+  # frontend:
+  #   image: nginx:alpine
+  #   container_name: scut_frontend
+  #   restart: always
+  #   ports:
+  #     - "80:80"
+  #   volumes:
+  #     - ./frontend:/usr/share/nginx/html
+  #   networks:
+  #     - scut_network
+
+networks:
+  scut_network:
+
+volumes:
+  mysql_data:

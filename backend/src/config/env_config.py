@@ -1,7 +1,4 @@
-from dotenv import load_dotenv
 import os
-# 加载 .env 文件
-load_dotenv()
 # -------------------------- 数据库配置 --------------------------
 ASYNC_DATABASE_URL = (
     f"mysql+aiomysql://"

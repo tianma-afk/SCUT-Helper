@@ -32,7 +32,7 @@
 ```
 scut_helper/
 ├── backend/                    # FastAPI后端
-│   ├── app/
+│   ├── /
 │   │   ├── routers/              # API路由
 │   │   ├── config/             # 核心配置
 │   │   ├── models/           # 数据模型
@@ -53,28 +53,43 @@ scut_helper/
 git clone https://github.com/tianma-afk/scut_helper.git
 cd scut_helper
 
-# 2. 创建并激活venv环境
-cd backend
-python -m venv venv
-venv\Scripts\activate.bat  #Windows环境
-source venv/bin/activate #MacOS或Linux
-
-# 3. 安装后端依赖
-pip install -r requirements.txt
-
-cd app
-# 4. 配置环境变量
+# 2. 配置环境变量
 #Linux/macOS 使用 cp 命令
 copy .env.example .env
-# 编辑.env文件设置数据库和密钥
+# 编辑.env文件，将.pem文件放在ssl文件夹下
 
-# 5. 启动服务
-uvicorn main:app --host 0.0.0.0 --port 8000 --reload
-#服务器使用虚拟环境的uvicorn启动
-#/opt/SCUT-Helper/backend/venv/bin/uvicorn main:app --host 0.0.0.0 --port 8000 --reload
+# 3. 启动服务
+docker-compose up -d --build
+
+# 4. 访问应用
+# API文档: https://localhost:8443/docs
+```
+
+### 后端开发
+
+```bash
+#其他常用命令
+# 查看日志
+docker-compose logs -f backend
+# 停止服务
+docker-compose down
+
+#修改python代码，可以热重载
+#保存并刷新浏览器即可
+
+#重启容器（读取新配置，修改docker-compose.yml和.env时）
+docker-compose restart backend
+
+#重新构建镜像并启动（修改Dockerfile和requirements.txt时）
+docker-compose build backend
+docker-compose up -d --build
+
+#（修改init.sql时，在scut_helper目录下执行）
+docker-compose exec -T db mysql -u root -p scut_helper < init.sql
 ```
 
 ### 前端启动（后续开发）
+
 ```bash
 cd frontend
 npm install
