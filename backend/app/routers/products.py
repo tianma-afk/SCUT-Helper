@@ -20,8 +20,7 @@ async def get_homepage_products(
         category_id:int=Query(...,alias="categoryId"),
         page: int = 1,
         page_size: int = Query(10, alias="pageSize", lt=100),
-        db:AsyncSession = Depends(get_db),
-        current_user = Depends(get_current_user)
+        db:AsyncSession = Depends(get_db)
 ):
     offset = (page - 1) * page_size
     homepage_list = await products.get_homepage_by_category(db, category_id, offset, page_size)
@@ -42,8 +41,7 @@ async def get_product_list(
         keyword:str=Query(...),
         page: int = 1,
         page_size: int = Query(10, alias="pageSize", lt=100),
-        db:AsyncSession = Depends(get_db),
-        current_user = Depends(get_current_user)
+        db:AsyncSession = Depends(get_db)
 ):
     offset = (page - 1) * page_size
     product_list = await products.get_product_by_keyword(db, keyword, offset, page_size)
@@ -62,8 +60,7 @@ async def get_product_list(
 @router.get("/detail")
 async def get_product_detail(
         product_id:int=Query(...,alias="productId"),
-        db:AsyncSession = Depends(get_db),
-        current_user = Depends(get_current_user)
+        db:AsyncSession = Depends(get_db)
 ):
     product = await products.get_product_details(db, product_id)
     if not product:
