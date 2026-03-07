@@ -32,7 +32,8 @@ main_router.include_router(products.router)
 app.include_router(main_router)
 
 if __name__ == "__main__":
-    uvicorn.run(app, host="0.0.0.0", port=PORT, ssl_keyfile=SSL_KEYFILE, ssl_certfile=SSL_CERTFILE)
+    uvicorn.run(app, host="127.0.0.1", port=PORT, ssl_keyfile=SSL_KEYFILE, ssl_certfile=SSL_CERTFILE)
 # 在app路径下启动虚拟环境的命令：..\venv\Scripts\activate.bat
 # 运行命令：python main.py
 # 访问FastAPI的交互式接口文档：https://127.0.0.1:8443/docs
+
