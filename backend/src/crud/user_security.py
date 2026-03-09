@@ -1,6 +1,6 @@
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select, update
-from models.user_security import UserSecurity  
+from models.user_security import UserSecurity
 from datetime import datetime, timedelta
 
 # -------------------------- 初始化相关 --------------------------

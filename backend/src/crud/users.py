@@ -4,7 +4,7 @@ from datetime import datetime, timedelta
 from sqlalchemy.future import select
 from sqlalchemy.ext.asyncio import AsyncSession
 from jose import jwt
-from models.users import User 
+from models.users import User
 from crud.email_verification_code import verify_code
 from config.env_config import pwd_context, JWT_SECRET_KEY, ALGORITHM,ACCESS_TOKEN_EXPIRE_HOURS
 
