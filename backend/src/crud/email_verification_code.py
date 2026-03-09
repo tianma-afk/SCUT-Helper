@@ -146,7 +146,8 @@ def _send_email(to_email: str, subject: str, content: str, charset: str = "utf-8
     # 4. 连接SMTP服务器发送邮件
     with smtplib.SMTP_SSL(SMTP_HOST, SMTP_PORT) as server:
         server.login(SMTP_USER, SMTP_PASS)
-        server.sendmail(SMTP_USER, [to_email], msg.as_string())
+        # 显式对邮件对象进行 utf-8 编码并作为字节流发送，解决中文 ascii 编码报错问题
+        server.sendmail(SMTP_USER, [to_email], msg.as_bytes())
 
 # -------------------------- 扩展函数：校验验证码（配套使用） --------------------------
 async def verify_code(
