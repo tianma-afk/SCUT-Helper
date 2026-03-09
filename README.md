@@ -50,7 +50,7 @@ scut_helper/
 ### 后端启动
 ```bash
 # 1. 克隆项目
-git clone https://github.com/tianma-afk/scut_helper.git
+git clone https://github.com/tianma-afk/SCUT_Helper.git
 cd scut_helper
 
 # 2. 配置环境变量
