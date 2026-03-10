@@ -72,13 +72,17 @@ docker-compose up -d --build
 # 查看日志
 docker-compose logs -f backend
 # 停止服务
-docker-compose down
+docker-compose down 
 
 #修改python代码，可以热重载
 #保存并刷新浏览器即可
 
 #重启容器（读取新配置，修改docker-compose.yml和.env时）
-docker-compose restart backend
+docker-compose down
+docker-compose up -d
+
+#想要删除数据库的数据
+docker-compose down -v
 
 #重新构建镜像并启动（修改Dockerfile和requirements.txt时）
 docker-compose build backend
