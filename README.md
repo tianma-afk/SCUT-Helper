@@ -4,12 +4,10 @@
 
 ## 🌟 项目简介
 
-**鲤工助手**是一个基于FastAPI + 小程序 +Vue.js的全栈校园智能助手，致力于解决华南理工大学师生的校园生活痛点，通过对话式交互提供便捷服务。
-
-
+**鲤工助手**是一个基于FastAPI + Uniapp的全栈校园智能助手，致力于解决华南理工大学师生的校园生活痛点，通过集成校园链接和对话式交互提供便捷服务。
 
 ### 核心愿景
-- 🤖 **智能对话**：自然语言处理，理解用户需求
+- 🤖 **智能对话**：对话交流，理解用户需求
 - 🎓 **学业支持**：选课指导、成绩查询、学习资源
 - 🍱 **生活服务**：云饭堂点餐、校园导航
 - 📚 **资源共享**：二手书交易、学习资料共享
@@ -48,121 +46,11 @@ scut_helper/
 ## 🚀 快速开始
 
 ### 后端启动
-```bash
-# 1. 克隆项目
-git clone https://github.com/tianma-afk/SCUT_Helper.git
-cd scut_helper
-
-# 2. 配置环境变量
-#Linux/macOS 使用 cp 命令
-copy .env.example .env
-# 编辑.env文件，将.pem文件放在ssl文件夹下
-
-# 3. 启动服务
-docker-compose up -d --build
-
-# 4. 访问应用
-# API文档: https://localhost:8443/docs
-```
-
-### 后端开发
-
-```bash
-#其他常用命令
-# 查看日志
-docker-compose logs -f backend
-# 停止服务
-docker-compose down 
-
-#修改python代码，可以热重载
-#保存并刷新浏览器即可
-
-#重启容器（读取新配置，修改docker-compose.yml和.env时）
-docker-compose down
-docker-compose up -d
-
-#想要删除数据库的数据
-docker-compose down -v
-
-#重新构建镜像并启动（修改Dockerfile和requirements.txt时）
-docker-compose build backend
-docker-compose up -d --build
-
-#（修改init.sql时，在scut_helper目录下执行）
-docker-compose exec -T db mysql -u root -p scut_helper < init.sql
-```
-
-### 前端启动（后续开发）
-
-```bash
-cd frontend
-npm install
-npm run dev
-```
-
-## 🔧 技术栈
-
-### 后端
-- **框架**：FastAPI + Uvicorn
-- **数据库**：MySQL（开发）→ PostgreSQL（生产）
-- **ORM**：SQLAlchemy + Alembic迁移
-- **认证**：JWT + OAuth2.0
-- **缓存**：Redis
-- **异步任务**：Celery + RabbitMQ
-- **API文档**：自动生成Swagger/ReDoc
-
-### 前端（规划）
-- **框架**：Vue 3 + TypeScript
-- **UI库**：Element Plus
-- **状态管理**：Pinia
-- **HTTP客户端**：Axios
-- **构建工具**：Vite
-
-### 智能模块
-- **NLP**：Transformers（BERT）
-- **对话**：LangChain + 大语言模型API
-- **推荐**：协同过滤 + 内容推荐
-
-## 👥 团队协作规范
-
-### 分支策略
-```
-main            - 生产环境代码
-develop         - 开发主分支
-feature/*      - 新功能开发
-bugfix/*       - 问题修复
-release/*      - 发布准备
-```
-
-### 提交规范
-```
-feat:    新功能
-fix:     修复bug
-docs:    文档更新
-style:   代码格式
-refactor:重构
-test:    测试相关
-chore:   构建/工具
-```
-
-### 开发流程
-1. 从develop创建特性分支
-2. 开发完成后提交Pull Request
-3. 代码评审 + CI测试通过
-4. 合并到develop分支
-5. 定期从develop合并到main发布
+见backend/README.md
 
 ## 📞 联系我们
 
-- **项目仓库**：[[tianma-afk/SCUT-Helper: 一个华工学生的日常智能助手。](https://github.com/tianma-afk/SCUT-Helper)](https://github.com/scut-embedded/scut_helper)
-- **协会官网**：[https://embedded.scut.edu.cn](https://embedded.scut.edu.cn)
 - **交流群**：QQ群 1026210091(软件方向)嵌入式协会交流群
-
-## 📄 许可证
-
-本项目采用 MIT 许可证 - 查看 [LICENSE](LICENSE) 文件了解详情。
-
----
 
 **鲤工助手，让校园生活更智能！**
 
