@@ -1,10 +1,5 @@
 from sqlalchemy.ext.asyncio import create_async_engine
-from sqlalchemy.orm import DeclarativeBase,Mapped, mapped_column
-from sqlalchemy import DateTime,String,func,Float
 from sqlalchemy.ext.asyncio import async_sessionmaker, AsyncSession
-from sqlalchemy import select
-import os
-from dotenv import load_dotenv
 from config.env_config import ASYNC_DATABASE_URL
 #创建数据库引擎
 async_engine = create_async_engine(
