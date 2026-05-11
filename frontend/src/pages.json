@@ -3,8 +3,17 @@
 		{
 			"path": "pages/index/index",
 			"style": {
-				"navigationBarTitleText": "鲤工助手",
-				"navigationBarBackgroundColor": "#ffffff",
+				"navigationStyle": "custom",
+				"navigationBarBackgroundColor": "#f8f9fc",
+				"navigationBarTextStyle": "black",
+				"enablePullDownRefresh": false
+			}
+		},
+		{
+			"path": "pages/butler/butler",
+			"style": {
+				"navigationStyle": "custom",
+				"navigationBarBackgroundColor": "#f8f9fc",
 				"navigationBarTextStyle": "black",
 				"enablePullDownRefresh": false
 			}
@@ -12,8 +21,8 @@
 		{
 			"path": "pages/user/user",
 			"style": {
-				"navigationBarTitleText": "鲤工助手",
-				"navigationBarBackgroundColor": "#ffffff",
+				"navigationStyle": "custom",
+				"navigationBarBackgroundColor": "#f8f9fc",
 				"navigationBarTextStyle": "black",
 				"enablePullDownRefresh": false
 			}
@@ -54,8 +63,8 @@
 	],
 	"globalStyle": {
 		"navigationBarTextStyle": "black",
-		"navigationBarTitleText": "鲤工助手",
+		"navigationBarTitleText": "华工助手",
 		"navigationBarBackgroundColor": "#ffffff",
-		"backgroundColor": "#f5f5f5"
+		"backgroundColor": "#f8f9fc"
 	}
 }
