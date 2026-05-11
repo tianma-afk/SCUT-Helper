@@ -4,7 +4,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from jose import JWTError, jwt ,ExpiredSignatureError
 from crud.users import get_user_by_id
 from config.db_config import get_db
-from config.env_config import JWT_SECRET_KEY, ALGORITHM,ACCESS_TOKEN_EXPIRE_HOURS
+from config.env_config import settings
 
 # 使用 HTTPBearer 自动从 Authorization 头提取 token
 security = HTTPBearer()
@@ -26,7 +26,7 @@ async def get_current_user(
     
     try:
         # 解码 token
-        payload = jwt.decode(token, JWT_SECRET_KEY, algorithms=[ALGORITHM])
+        payload = jwt.decode(token, settings.JWT_SECRET_KEY, algorithms=[settings.ALGORITHM])
         user_id: str = payload.get("sub")
         if user_id is None:
             raise credentials_exception

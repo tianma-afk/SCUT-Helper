@@ -6,7 +6,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from jose import jwt
 from models.users import User
 from crud.email_verification_code import verify_code
-from config.env_config import pwd_context, JWT_SECRET_KEY, ALGORITHM,ACCESS_TOKEN_EXPIRE_HOURS
+from config.env_config import settings 
 
 
 # -------------------------- 核心CRUD函数 --------------------------
@@ -25,7 +25,7 @@ async def user_register(
     """
     try:
         # 步骤1：密码BCrypt加密
-        hashed_password = pwd_context.hash(password)
+        hashed_password = settings.pwd_context.hash(password)
         
         # 步骤2：构建用户对象
         new_user = User(
@@ -68,7 +68,7 @@ async def user_login(
     user = result.scalars().first()
     
     # 步骤2：校验密码（BCrypt验证）
-    if not user or not pwd_context.verify(password, user.password):
+    if not user or not settings.pwd_context.verify(password, user.password):
         return None
     
     # 步骤3：生成JWT Token
@@ -76,10 +76,10 @@ async def user_login(
         claims={
             "user_id": user.user_id,
             "email": user.email,
-            "exp": datetime.now() + timedelta(hours=ACCESS_TOKEN_EXPIRE_HOURS)
+            "exp": datetime.now() + timedelta(hours=settings.ACCESS_TOKEN_EXPIRE_HOURS)
         },
-        key=JWT_SECRET_KEY,
-        algorithm=ALGORITHM
+        key=settings.JWT_SECRET_KEY,
+        algorithm=settings.JWT_ALGORITHM
     )
     return access_token
 
@@ -101,7 +101,7 @@ async def update_user_password(
         user = result.scalars().first()
         
         # 步骤2：校验原密码
-        if not user or not pwd_context.verify(old_password, user.password):
+        if not user or not settings.pwd_context.verify(old_password, user.password):
             return False
         
         # 步骤3：新密码加密并更新

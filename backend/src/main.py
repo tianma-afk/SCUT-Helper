@@ -2,10 +2,11 @@ from routers import user_security
 from routers import users
 from routers import user_login_log
 from routers import products
+from routers import chat
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 import uvicorn
-from config.env_config import SSL_KEYFILE, SSL_CERTFILE, PORT
+from config.env_config import settings
 from fastapi import APIRouter
 
 app = FastAPI()
@@ -27,15 +28,17 @@ main_router = APIRouter(prefix="/api/v1")
 main_router.include_router(users.router)
 main_router.include_router(user_security.router)
 main_router.include_router(user_login_log.router)
+main_router.include_router(chat.router)
 main_router.include_router(products.router)
 
 app.include_router(main_router)
 
 if __name__ == "__main__":
     #使用http
-    uvicorn.run(app, host="0.0.0.0", port=PORT)
+    uvicorn.run(app, host="0.0.0.0", port=settings.PORT)
     # uvicorn.run(app, host="0.0.0.0", port=PORT, ssl_keyfile=SSL_KEYFILE, ssl_certfile=SSL_CERTFILE)
 # 在app路径下启动虚拟环境的命令：..\venv\Scripts\activate.bat
 # 运行命令：python main.py
 # 访问FastAPI的交互式接口文档：https://127.0.0.1:8443/docs
+#  curl -N http://localhost:8443/api/v1/chat/stream -H "Content-Type: application/json" -d '{"message": "你好啊"}' --no-buffer
 

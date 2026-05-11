@@ -8,7 +8,7 @@ from sqlalchemy.future import select
 from sqlalchemy.ext.asyncio import AsyncSession
 from models.email_verification_code import EmailVerificationCode
 import base64
-from config.env_config import SMTP_HOST, SMTP_PORT, SMTP_USER, SMTP_PASS, SENDER_NAME
+from config.env_config import settings
 
 
 # -------------------------- 发送验证码 --------------------------
@@ -83,7 +83,7 @@ async def send_code(
         """
         _send_email(
             to_email=email,
-            subject=f"{_get_type_desc(code_type)}验证码 - {SENDER_NAME}",
+            subject=f"{_get_type_desc(code_type)}验证码 - {settings.SENDER_NAME}",
             content=mail_content
         )
     except ValueError as e:
@@ -132,9 +132,9 @@ def _send_email(to_email: str, subject: str, content: str, charset: str = "utf-8
     :param charset: 字符集，默认utf-8
     """
     # 1. 编码发件人昵称（解决中文昵称校验失败）
-    encoded_name = _encode_sender_name(SENDER_NAME, charset)
+    encoded_name = _encode_sender_name(settings.SENDER_NAME, charset)
     # 2. 严格按QQ邮箱要求拼接From头："编码昵称" <发件人邮箱>
-    from_header = f'"{encoded_name}" <{SMTP_USER}>'
+    from_header = f'"{encoded_name}" <{settings.SMTP_USER}>'
 
     # 3. 构建邮件对象
     msg = MIMEText(content, "html", charset)
@@ -144,10 +144,10 @@ def _send_email(to_email: str, subject: str, content: str, charset: str = "utf-8
     msg["Subject"] = Header(subject, charset)
 
     # 4. 连接SMTP服务器发送邮件
-    with smtplib.SMTP_SSL(SMTP_HOST, SMTP_PORT) as server:
-        server.login(SMTP_USER, SMTP_PASS)
+    with smtplib.SMTP_SSL(settings.SMTP_HOST, settings.SMTP_PORT) as server:
+        server.login(settings.SMTP_USER, settings.SMTP_PASS)
         # 显式对邮件对象进行 utf-8 编码并作为字节流发送，解决中文 ascii 编码报错问题
-        server.sendmail(SMTP_USER, [to_email], msg.as_bytes())
+        server.sendmail(settings.SMTP_USER, [to_email], msg.as_bytes())
 
 # -------------------------- 扩展函数：校验验证码（配套使用） --------------------------
 async def verify_code(

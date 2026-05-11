@@ -7,7 +7,8 @@ from config.db_config import get_db
 from pydantic import Field
 from crud.user_login_log import create_login_log
 from crud.email_verification_code import send_code
-from config.env_config import PASSWORD_PATTERN
+from config.env_config import settings, PASSWORD_PATTERN
+
 # -------------------------- 定义接口请求/响应模型 --------------------------
 router = APIRouter(prefix="/users", tags=["用户管理"])  # 接口前缀/api/users，标签分类
 
